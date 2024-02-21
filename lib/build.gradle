@@ -40,5 +40,16 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+// Embeds all dependencies to create a fat jar by creating a separate task
+task customFatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'edu.touro.mco152.bm.App'
+    }
+    archiveBaseName = 'badbm'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
 sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDirs.asPath
 compileJava.dependsOn(processResources)
