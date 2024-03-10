@@ -10,10 +10,8 @@ import java.util.logging.Logger;
 import static edu.touro.mco152.bm.App.dataDir;
 
 /**
- * This class is an implementation of the UiInterface, and extends SwingWorker.
- * It leverages SwingWorker methods to provide a swing implementation of UiInterface.
+ * This class provides a Swing implementation of the UiInterface by extending SwingWorker and leveraging its methods.
  */
-
 public class SwingUi extends SwingWorker<Boolean, DiskMark> implements UiInterface{
     // Record any success or failure status returned from SwingWorker (might be us or super)
     Boolean lastStatus = null;  // so far unknown
