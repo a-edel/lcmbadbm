@@ -35,7 +35,6 @@ import static edu.touro.mco152.bm.DiskMark.MarkType.WRITE;
  * doInBackground() is finished) is of type Boolean, and declares that intermediate results are communicated to
  * Swing using an instance of the DiskMark class.
  */
-
 public class DiskWorker {
     UiInterface ui;
     public DiskWorker(UiInterface ui)
