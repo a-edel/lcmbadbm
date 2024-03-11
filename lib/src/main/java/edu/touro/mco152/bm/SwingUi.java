@@ -14,7 +14,7 @@ import static edu.touro.mco152.bm.App.dataDir;
  */
 public class SwingUi extends SwingWorker<Boolean, DiskMark> implements UiInterface{
     // Record any success or failure status returned from SwingWorker (might be us or super)
-    Boolean lastStatus = null;  // so far unknown
+    private Boolean lastStatus = null;  // so far unknown
     private DiskWorker diskWorker;
 
     public SwingUi()
