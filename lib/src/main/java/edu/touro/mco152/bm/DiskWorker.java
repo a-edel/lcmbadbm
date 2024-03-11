@@ -36,7 +36,7 @@ import static edu.touro.mco152.bm.DiskMark.MarkType.WRITE;
  * Swing using an instance of the DiskMark class.
  */
 public class DiskWorker {
-    UiInterface ui;
+    private UiInterface ui;
     public DiskWorker(UiInterface ui)
     {
         this.ui = ui;
