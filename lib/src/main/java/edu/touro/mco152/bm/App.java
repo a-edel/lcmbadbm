@@ -16,10 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Contains the main runnable method of the program.
- * Primary holder of global variables.
- * Responsible for changing properties configurations.
- * Initiates the custom Swing benchmark handling class. {@link DiskWorker}
+ * Primary class for global variables, main and common methods.
  */
 public class App {
 
@@ -48,7 +45,7 @@ public class App {
     public static int numOfMarks = 25;      // desired number of marks
     public static int numOfBlocks = 32;     // desired number of blocks
     public static int blockSizeKb = 512;    // size of a block in KBs
-    public static DiskWorker worker = null;
+    public static UiInterface ui;
     public static int nextMarkNumber = 1;   // number of the next mark
     public static double wMax = -1, wMin = -1, wAvg = -1;
     public static double rMax = -1, rMin = -1, rAvg = -1;
@@ -57,6 +54,8 @@ public class App {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        // ui is chosen here
+        ui = new SwingUi();
 
         /* Set the Nimbus look and feel */
         try {
@@ -73,8 +72,8 @@ public class App {
              */
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-                java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
             //</editor-fold>
         }
@@ -85,7 +84,7 @@ public class App {
     /**
      * Get the version from the build properties. Defaults to 0.0 if not found.
      *
-     * @return a String set to the proper version number
+     * @return
      */
     public static String getVersion() {
         Properties bp = new Properties();
@@ -239,16 +238,13 @@ public class App {
     }
 
     public static void cancelBenchmark() {
-        if (worker == null) {
+        if (ui == null) {
             msg("worker is null abort...");
             return;
         }
-        worker.cancel(true);
+        ui.uiCancel(true);
     }
 
-    /**
-     * Handles benchmark and GUI configuration/management when a benchmark is started.
-     */
     public static void startBenchmark() {
 
         //1. check that there isn't already a worker in progress
@@ -268,9 +264,8 @@ public class App {
         state = State.DISK_TEST_STATE;
         Gui.mainFrame.adjustSensitivity();
 
-        //4. set up disk worker thread and its event handlers
-        worker = new DiskWorker();
-        worker.addPropertyChangeListener((final PropertyChangeEvent event) -> {
+        //4. set up ui and its event handlers
+        ui.uiAddPropertyChangeListener((final PropertyChangeEvent event) -> {
             switch (event.getPropertyName()) {
                 case "progress":
                     int value = (Integer) event.getNewValue();
@@ -291,7 +286,7 @@ public class App {
         });
 
         //5. start the Swing worker thread
-        worker.execute();
+        ui.startUi();
     }
 
     /**
@@ -342,10 +337,6 @@ public class App {
         return (long) blockSizeKb * numOfBlocks * numOfMarks;
     }
 
-    /**
-     * Uses a DiskMark {@link DiskMark} Object to update the metrics of the App while it is running
-     * @param mark- A DiskMark Object which swill be used to update the Metric
-     */
     public static void updateMetrics(DiskMark mark) {
         if (mark.type == DiskMark.MarkType.WRITE) {
             if (wMax == -1 || wMax < mark.getBwMbSec()) {
