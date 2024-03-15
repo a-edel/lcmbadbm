@@ -20,6 +20,8 @@ dependencies {
     testImplementation libs.junit.jupiter
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 
     // This dependency is exported to consumers, that is to say found on their compile classpath.
     api libs.commons.math3
@@ -64,3 +66,7 @@ task customFatJar(type: Jar) {
 
 sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDirs.asPath
 compileJava.dependsOn(processResources)
+
+test {
+    useJUnitPlatform()
+}
