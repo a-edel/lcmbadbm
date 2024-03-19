@@ -51,8 +51,12 @@ public class DiskMark {
         return markNum;
     }
 
+    /**
+     * Added if statement so that only non-negative markNum ints can be set with setMarkNum()
+     */
     public void setMarkNum(int markNum) {
-        this.markNum = markNum;
+        if (markNum >= 0)
+            this.markNum = markNum;
     }
 
     public double getBwMbSec() {
