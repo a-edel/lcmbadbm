@@ -54,9 +54,6 @@ public class App {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // ui is chosen here
-        ui = new SwingUi();
-
         /* Set the Nimbus look and feel */
         try {
             for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -265,6 +262,8 @@ public class App {
         Gui.mainFrame.adjustSensitivity();
 
         //4. set up ui and its event handlers
+        // ui is chosen here
+        ui = new SwingUi();
         ui.uiAddPropertyChangeListener((final PropertyChangeEvent event) -> {
             switch (event.getPropertyName()) {
                 case "progress":
