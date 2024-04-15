@@ -52,7 +52,7 @@ public class DiskMark {
     }
 
     public void setMarkNum(int markNum) {
-        this.markNum = markNum;
+            this.markNum = markNum;
     }
 
     public double getBwMbSec() {
