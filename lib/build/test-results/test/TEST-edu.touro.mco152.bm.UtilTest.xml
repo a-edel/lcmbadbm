@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="edu.touro.mco152.bm.UtilTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2024-03-17T20:55:08" hostname="DESKTOP-CU6EHNM" time="0.011">
-  <properties/>
-  <testcase name="randIntError()" classname="edu.touro.mco152.bm.UtilTest" time="0.003"/>
-  <testcase name="randIntRange()" classname="edu.touro.mco152.bm.UtilTest" time="0.004"/>
-  <testcase name="randIntTime()" classname="edu.touro.mco152.bm.UtilTest" time="0.002"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
