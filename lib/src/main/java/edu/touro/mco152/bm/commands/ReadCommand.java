@@ -12,6 +12,7 @@ import jakarta.persistence.EntityManager;
 import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Date;
 import java.util.logging.Level;
@@ -20,14 +21,42 @@ import java.util.logging.Logger;
 import static edu.touro.mco152.bm.App.*;
 import static edu.touro.mco152.bm.DiskMark.MarkType.READ;
 
-public class ReadCommand {
-    public void execute(UiInterface ui) throws Exception {
+/**
+ * Represents a command to perform a read operation. Implements the Command interface.
+ */
+public class ReadCommand implements Command {
+    private UiInterface ui;
+    private int numOfMarks;
+    private int numOfBlocks;
+    private int blockSizeKb;
+    private DiskRun.BlockSequence blockSequence;
+
+    /**
+     * Constructs a ReadCommand object with the specified parameters.
+     *
+     * @param ui              the user interface
+     * @param numOfMarks      the number of marks
+     * @param numOfBlocks     the number of blocks
+     * @param blockSizeKb     the block size in kilobytes
+     * @param blockSequence   the block sequence
+     */
+    public ReadCommand(UiInterface ui, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence)
+    {
+        this.ui = ui;
+        this.numOfMarks = numOfMarks;
+        this.numOfBlocks = numOfBlocks;
+        this.blockSizeKb = blockSizeKb;
+        this.blockSequence = blockSequence;
+    }
+
+    @Override
+    public void execute() {
         int wUnitsComplete = 0,
                 rUnitsComplete = 0,
                 unitsComplete;
 
         int wUnitsTotal = App.writeTest ? numOfBlocks * numOfMarks : 0;
-        int rUnitsTotal = App.readTest ? numOfBlocks * numOfMarks : 0;
+        int rUnitsTotal = numOfBlocks * numOfMarks;
         int unitsTotal = wUnitsTotal + rUnitsTotal;
         float percentComplete;
 
@@ -42,10 +71,10 @@ public class ReadCommand {
         DiskMark rMark;
         int startFileNum = App.nextMarkNumber;
 
-        DiskRun run = new DiskRun(DiskRun.IOMode.READ, App.blockSequence);
-        run.setNumMarks(App.numOfMarks);
-        run.setNumBlocks(App.numOfBlocks);
-        run.setBlockSize(App.blockSizeKb);
+        DiskRun run = new DiskRun(DiskRun.IOMode.READ, blockSequence);
+        run.setNumMarks(numOfMarks);
+        run.setNumBlocks(numOfBlocks);
+        run.setBlockSize(blockSizeKb);
         run.setTxSize(App.targetTxSizeKb());
         run.setDiskInfo(Util.getDiskInfo(dataDir));
 
@@ -54,7 +83,7 @@ public class ReadCommand {
         Gui.chartPanel.getChart().getTitle().setVisible(true);
         Gui.chartPanel.getChart().getTitle().setText(run.getDiskInfo());
 
-        for (int m = startFileNum; m < startFileNum + App.numOfMarks && !ui.isUiCancelled(); m++) {
+        for (int m = startFileNum; m < startFileNum + numOfMarks && !ui.isUiCancelled(); m++) {
 
             if (App.multiFile) {
                 testFile = new File(dataDir.getAbsolutePath()
@@ -68,7 +97,7 @@ public class ReadCommand {
             try {
                 try (RandomAccessFile rAccFile = new RandomAccessFile(testFile, "r")) {
                     for (int b = 0; b < numOfBlocks; b++) {
-                        if (App.blockSequence == DiskRun.BlockSequence.RANDOM) {
+                        if (blockSequence == DiskRun.BlockSequence.RANDOM) {
                             int rLoc = Util.randInt(0, numOfBlocks - 1);
                             rAccFile.seek((long) rLoc * blockSize);
                         } else {
@@ -88,6 +117,9 @@ public class ReadCommand {
                         ex.getMessage();
                 JOptionPane.showMessageDialog(Gui.mainFrame, exMsg, "Unable to READ", JOptionPane.ERROR_MESSAGE);
                 msg(exMsg);
+            }
+            catch (IOException e) {
+
             }
             long endTime = System.nanoTime();
             long elapsedTimeNs = endTime - startTime;

@@ -20,15 +20,42 @@ import static edu.touro.mco152.bm.App.*;
 import static edu.touro.mco152.bm.App.msg;
 import static edu.touro.mco152.bm.DiskMark.MarkType.WRITE;
 
-public class WriteCommand {
+/**
+ * Represents a command to perform a write operation. Implements the Command interface.
+ */
+public class WriteCommand implements Command {
+    private UiInterface ui;
+    private int numOfMarks;
+    private int numOfBlocks;
+    private int blockSizeKb;
+    private DiskRun.BlockSequence blockSequence;
 
-    public void execute(UiInterface ui)
+    /**
+     * Constructs a WriteCommand object with the specified parameters.
+     *
+     * @param ui              the user interface
+     * @param numOfMarks      the number of marks
+     * @param numOfBlocks     the number of blocks
+     * @param blockSizeKb     the block size in kilobytes
+     * @param blockSequence   the block sequence
+     */
+    public WriteCommand(UiInterface ui, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence)
+    {
+        this.ui = ui;
+        this.numOfMarks = numOfMarks;
+        this.numOfBlocks = numOfBlocks;
+        this.blockSizeKb = blockSizeKb;
+        this.blockSequence = blockSequence;
+    }
+
+    @Override
+    public void execute()
     {
         int wUnitsComplete = 0,
                 rUnitsComplete = 0,
                 unitsComplete;
 
-        int wUnitsTotal = App.writeTest ? numOfBlocks * numOfMarks : 0;
+        int wUnitsTotal = numOfBlocks * numOfMarks;
         int rUnitsTotal = App.readTest ? numOfBlocks * numOfMarks : 0;
         int unitsTotal = wUnitsTotal + rUnitsTotal;
         float percentComplete;
@@ -43,10 +70,10 @@ public class WriteCommand {
 
         DiskMark wMark;
         int startFileNum = App.nextMarkNumber;
-        DiskRun run = new DiskRun(DiskRun.IOMode.WRITE, App.blockSequence);
-        run.setNumMarks(App.numOfMarks);
-        run.setNumBlocks(App.numOfBlocks);
-        run.setBlockSize(App.blockSizeKb);
+        DiskRun run = new DiskRun(DiskRun.IOMode.WRITE, blockSequence);
+        run.setNumMarks(numOfMarks);
+        run.setNumBlocks(numOfBlocks);
+        run.setBlockSize(blockSizeKb);
         run.setTxSize(App.targetTxSizeKb());
         run.setDiskInfo(Util.getDiskInfo(dataDir));
 
@@ -61,12 +88,12 @@ public class WriteCommand {
             testFile = new File(dataDir.getAbsolutePath() + File.separator + "testdata.jdm");
         }
 
-            /*
-              Begin an outer loop for specified duration (number of 'marks') of benchmark,
-              that keeps writing data (in its own loop - for specified # of blocks). Each 'Mark' is timed
-              and is reported to the GUI for display as each Mark completes.
-             */
-        for (int m = startFileNum; m < startFileNum + App.numOfMarks && !ui.isUiCancelled(); m++) {
+        /*
+          Begin an outer loop for specified duration (number of 'marks') of benchmark,
+          that keeps writing data (in its own loop - for specified # of blocks). Each 'Mark' is timed
+          and is reported to the GUI for display as each Mark completes.
+         */
+        for (int m = startFileNum; m < startFileNum + numOfMarks && !ui.isUiCancelled(); m++) {
 
             if (App.multiFile) {
                 testFile = new File(dataDir.getAbsolutePath()
@@ -85,7 +112,7 @@ public class WriteCommand {
             try {
                 try (RandomAccessFile rAccFile = new RandomAccessFile(testFile, mode)) {
                     for (int b = 0; b < numOfBlocks; b++) {
-                        if (App.blockSequence == DiskRun.BlockSequence.RANDOM) {
+                        if (blockSequence == DiskRun.BlockSequence.RANDOM) {
                             int rLoc = Util.randInt(0, numOfBlocks - 1);
                             rAccFile.seek((long) rLoc * blockSize);
                         } else {
@@ -107,9 +134,9 @@ public class WriteCommand {
                 Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-                /*
-                  Compute duration, throughput of this Mark's step of BM
-                 */
+            /*
+              Compute duration, throughput of this Mark's step of BM
+             */
             long endTime = System.nanoTime();
             long elapsedTimeNs = endTime - startTime;
             double sec = (double) elapsedTimeNs / (double) 1000000000;
@@ -120,9 +147,9 @@ public class WriteCommand {
                     + Util.displayString(sec) + " sec)");
             App.updateMetrics(wMark);
 
-                /*
-                  Let the GUI know the interim result described by the current Mark
-                 */
+            /*
+              Let the GUI know the interim result described by the current Mark
+             */
             ui.uiPublish(wMark);
 
             // Keep track of statistics to be displayed and persisted after all Marks are done.

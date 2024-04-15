@@ -1,14 +1,14 @@
 package edu.touro.mco152.bm;
 
+import edu.touro.mco152.bm.commands.Executor;
 import edu.touro.mco152.bm.commands.ReadCommand;
 import edu.touro.mco152.bm.commands.WriteCommand;
 import edu.touro.mco152.bm.ui.Gui;
 
-import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static edu.touro.mco152.bm.App.*;
+import static edu.touro.mco152.bm.App.msg;
 
 /**
  * Run the disk benchmarking as a Swing-compliant thread (only one of these threads can run at
@@ -28,6 +28,7 @@ import static edu.touro.mco152.bm.App.*;
  * Swing using an instance of the DiskMark class.
  */
 public class DiskWorker {
+    Executor executor;
     private UiInterface ui;
     public DiskWorker(UiInterface ui)
     {
@@ -54,14 +55,17 @@ public class DiskWorker {
             Gui.resetTestData();
         }
 
+        // Executor is instantiated here
+        executor = new Executor();
+
         /*
           The GUI allows a Write, Read, or both types of BMs to be started. They are done serially.
          */
         if (App.writeTest) {
-            WriteCommand writeCommand = new WriteCommand();
-            writeCommand.execute(ui);
+            WriteCommand writeCommand = new WriteCommand(ui, App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence);
+            executor.setCommand(writeCommand);
+            executor.executeCommand();
         }
-
 
         /*
           Most benchmarking systems will try to do some cleanup in between 2 benchmark operations to
@@ -76,15 +80,9 @@ public class DiskWorker {
 
         // Same as above, just for Read operations instead of Writes.
         if (App.readTest) {
-            try
-            {
-                ReadCommand readCommand = new ReadCommand();
-                readCommand.execute(ui);
-            }
-            catch (FileNotFoundException ex)
-            {
-                return false;
-            }
+            ReadCommand readCommand = new ReadCommand(ui, App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence);
+            executor.setCommand(readCommand);
+            executor.executeCommand();
         }
         App.nextMarkNumber += App.numOfMarks;
         return true;
