@@ -50,10 +50,9 @@ public class ReadCommand implements Command {
     }
 
     @Override
-    public void execute() {
-        int wUnitsComplete = 0,
-                rUnitsComplete = 0,
-                unitsComplete;
+    public Boolean execute() {
+
+        int wUnitsComplete = 0, rUnitsComplete = 0, unitsComplete;
 
         int wUnitsTotal = App.writeTest ? numOfBlocks * numOfMarks : 0;
         int rUnitsTotal = numOfBlocks * numOfMarks;
@@ -146,5 +145,7 @@ public class ReadCommand implements Command {
         em.getTransaction().commit();
 
         Gui.runPanel.addRun(run);
+
+        return true;
     }
 }

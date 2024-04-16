@@ -49,7 +49,7 @@ public class WriteCommand implements Command {
     }
 
     @Override
-    public void execute()
+    public Boolean execute()
     {
         int wUnitsComplete = 0,
                 rUnitsComplete = 0,
@@ -60,11 +60,11 @@ public class WriteCommand implements Command {
         int unitsTotal = wUnitsTotal + rUnitsTotal;
         float percentComplete;
 
-        int blockSize = blockSizeKb*KILOBYTE;
-        byte [] blockArr = new byte [blockSize];
-        for (int b=0; b<blockArr.length; b++) {
-            if (b%2==0) {
-                blockArr[b]=(byte)0xFF;
+        int blockSize = blockSizeKb * KILOBYTE;
+        byte[] blockArr = new byte[blockSize];
+        for (int b = 0; b < blockArr.length; b++) {
+            if (b % 2 == 0) {
+                blockArr[b] = (byte) 0xFF;
             }
         }
 
@@ -132,6 +132,7 @@ public class WriteCommand implements Command {
                 }
             } catch (IOException ex) {
                 Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+                return false;
             }
 
             /*
@@ -168,5 +169,7 @@ public class WriteCommand implements Command {
         em.getTransaction().commit();
 
         Gui.runPanel.addRun(run);
+
+        return true;
     }
 }

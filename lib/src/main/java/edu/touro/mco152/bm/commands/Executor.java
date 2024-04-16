@@ -10,19 +10,11 @@ public class Executor {
      */
     private Command command;
 
-    /**
-     * Sets the command to be executed.
-     *
-     * @param command The command to be executed.
-     */
-    public void setCommand(Command command){
-        this.command = command;
-    }
-
-    /**
+        /**
      * Executes the command set within this Executor.
      */
-    public void executeCommand(){
-        command.execute();
+    public Boolean executeCommand(Command command)
+    {
+        return command.execute();
     }
 }

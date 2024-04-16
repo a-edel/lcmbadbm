@@ -9,6 +9,6 @@ public interface Command {
     /**
      * Executes the command.
      */
-    void execute();
+    Boolean execute();
 }
 
