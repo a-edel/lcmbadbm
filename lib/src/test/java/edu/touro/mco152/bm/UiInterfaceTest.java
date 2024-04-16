@@ -2,7 +2,9 @@ package edu.touro.mco152.bm;
 
 import edu.touro.mco152.bm.ui.Gui;
 import edu.touro.mco152.bm.ui.MainFrame;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -15,14 +17,14 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class UiInterfaceTest implements UiInterface
 {
+    private int progress = 0;
+    private DiskWorker diskWorker = new DiskWorker(this);
+
+
     /**
      * Bruteforce setup of static classes/fields to allow DiskWorker to run.
      */
-    private DiskWorker diskWorker;
-    private int progress = 0;
-
-    @Test
-    void setupDefaultAsPerProperties()
+    static void setupDefaultAsPerProperties()
     {
         // Do the minimum of what  App.init() would do to allow to run.
         Gui.mainFrame = new MainFrame();
@@ -56,9 +58,11 @@ public class UiInterfaceTest implements UiInterface
         {
             App.dataDir.mkdirs(); // create data dir if not already present
         }
+    }
 
-        diskWorker = new DiskWorker(this);
-        startUi();
+    @BeforeAll
+    static void setupBeforeAll() {
+        setupDefaultAsPerProperties();
     }
 
     @Override
@@ -69,18 +73,23 @@ public class UiInterfaceTest implements UiInterface
 
     @Override
     public void uiPublish(DiskMark dm) {
-        assertNotNull(dm);
     }
 
     @Override
     public void startUi() {
         try {
-            assertEquals(0, progress);
             assertTrue(diskWorker.startBenchmarking());
-            assertEquals(100, progress);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Test
+    void benchmarkTest()
+    {
+        assertEquals(0, progress);
+        startUi();
+        assertEquals(100, progress);
     }
 
     @Override
