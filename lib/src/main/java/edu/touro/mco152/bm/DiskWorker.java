@@ -64,6 +64,7 @@ public class DiskWorker {
         if (App.writeTest) {
             WriteCommand writeCommand = new WriteCommand(ui, App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence);
             executor.executeCommand(writeCommand);
+
         }
 
         /*
@@ -80,7 +81,8 @@ public class DiskWorker {
         // Same as above, just for Read operations instead of Writes.
         if (App.readTest) {
             ReadCommand readCommand = new ReadCommand(ui, App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence);
-            executor.executeCommand(readCommand);
+            if(!executor.executeCommand(readCommand))
+                return false;
         }
         App.nextMarkNumber += App.numOfMarks;
         return true;

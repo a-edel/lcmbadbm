@@ -110,16 +110,15 @@ public class ReadCommand implements Command {
                         ui.setUiProgress((int) percentComplete);
                     }
                 }
-            } catch (FileNotFoundException ex) {
+            } catch (IOException ex) {
                 Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
-                String exMsg = "May not have done Write Benchmarks, so no data available to read." +
+                String emsg = "May not have done Write Benchmarks, so no data available to read." +
                         ex.getMessage();
-                JOptionPane.showMessageDialog(Gui.mainFrame, exMsg, "Unable to READ", JOptionPane.ERROR_MESSAGE);
-                msg(exMsg);
+                JOptionPane.showMessageDialog(Gui.mainFrame, emsg, "Unable to READ", JOptionPane.ERROR_MESSAGE);
+                msg(emsg);
+                return false;
             }
-            catch (IOException e) {
 
-            }
             long endTime = System.nanoTime();
             long elapsedTimeNs = endTime - startTime;
             double sec = (double) elapsedTimeNs / (double) 1000000000;

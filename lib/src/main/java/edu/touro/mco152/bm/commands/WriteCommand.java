@@ -132,7 +132,6 @@ public class WriteCommand implements Command {
                 }
             } catch (IOException ex) {
                 Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
-                return false;
             }
 
             /*
