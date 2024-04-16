@@ -91,7 +91,7 @@ public class CommandTest {
      * Test method for read command execution.
      */
     @Test
-    public void readTest(){
+    public void readTest() throws Exception {
         ReadCommand readCommand = new ReadCommand(ui, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
         assertTrue(executor.executeCommand(readCommand));
     }
@@ -100,7 +100,7 @@ public class CommandTest {
      * Test method for write command execution.
      */
     @Test
-    public void writeTest(){
+    public void writeTest() throws Exception {
         WriteCommand writeCommand = new WriteCommand(ui, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
         assertTrue(executor.executeCommand(writeCommand));
     }

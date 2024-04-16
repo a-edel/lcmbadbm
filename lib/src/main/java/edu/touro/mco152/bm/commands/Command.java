@@ -1,14 +1,17 @@
 package edu.touro.mco152.bm.commands;
 
 /**
- * Represents a command to be performed, in this case either a 'write' or a 'read'. Classes that implement this interface
- * encapsulate the command's details and provide a method to execute it.
+ * The Command interface represents a command to be executed. Classes that implement
+ * this interface encapsulate the details of a specific command and provide a method
+ * to execute it.
  */
 public interface Command {
 
     /**
      * Executes the command.
+     *
+     * @return true if the command is executed successfully, otherwise false
+     * @throws Exception if an error occurs during command execution
      */
-    Boolean execute();
+    Boolean execute() throws Exception;
 }
-

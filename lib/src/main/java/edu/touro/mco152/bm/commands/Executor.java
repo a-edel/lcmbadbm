@@ -13,7 +13,7 @@ public class Executor {
         /**
      * Executes the command set within this Executor.
      */
-    public Boolean executeCommand(Command command)
+    public Boolean executeCommand(Command command) throws Exception
     {
         return command.execute();
     }
