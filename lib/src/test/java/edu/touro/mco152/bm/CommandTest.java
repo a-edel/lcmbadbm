@@ -88,20 +88,20 @@ public class CommandTest {
     }
 
     /**
-     * Test method for read command execution.
-     */
-    @Test
-    public void readTest() throws Exception {
-        ReadCommand readCommand = new ReadCommand(ui, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
-        assertTrue(executor.executeCommand(readCommand));
-    }
-
-    /**
      * Test method for write command execution.
      */
     @Test
     public void writeTest() throws Exception {
         WriteCommand writeCommand = new WriteCommand(ui, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
         assertTrue(executor.executeCommand(writeCommand));
+    }
+
+    /**
+     * Test method for read command execution.
+     */
+    @Test
+    public void readTest() throws Exception {
+        ReadCommand readCommand = new ReadCommand(ui, numOfMarks, numOfBlocks, blockSizeKb, blockSequence, 0, 0);
+        assertTrue(executor.executeCommand(readCommand));
     }
 }

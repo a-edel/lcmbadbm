@@ -4,13 +4,13 @@ import edu.touro.mco152.bm.ui.Gui;
 import edu.touro.mco152.bm.ui.MainFrame;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This class is a non-Swing implementation of the UiInterface and provides testing for its methods.
@@ -67,6 +67,7 @@ public class UiInterfaceTest implements UiInterface
 
     @Override
     public void setUiProgress(int progress) {
+        System.out.println(progress);
         this.progress = progress;
         assertTrue(progress >= 0 && progress <= 100);
     }
@@ -99,9 +100,8 @@ public class UiInterfaceTest implements UiInterface
                         using the included RAMMap.exe or flush-mem.exe utilities.
                         Removable drives can be disconnected and reconnected.
                         For system drives use the WRITE and READ operations
-                        independently by doing a cold reboot after the WRITE. 
+                        independently by doing a cold reboot after the WRITE.
                         """);
-
     }
 
     // following methods not instantiated for basic ui
