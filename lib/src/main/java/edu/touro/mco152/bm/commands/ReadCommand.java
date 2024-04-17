@@ -20,38 +20,57 @@ import static edu.touro.mco152.bm.DiskMark.MarkType.READ;
  * Represents a command to perform a read operation. Implements the Command interface.
  */
 public class ReadCommand extends IOCommand {
+    private int wUnitsComplete;
+    private int rUnitsComplete;
 
-    public ReadCommand(UiInterface ui, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence)
+    public ReadCommand(UiInterface ui, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence, int wUnitsComplete, int rUnitsComplete)
     {
         super(ui, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
+        this.wUnitsComplete = wUnitsComplete;
+        this.rUnitsComplete = rUnitsComplete;
     }
 
     @Override
-    public DiskRun createDiskRun(DiskRun.BlockSequence blockSequence)
+    protected void incrementProcessUnitsComplete() {
+        rUnitsComplete++;
+    }
+
+    @Override
+    protected int getWUnitsComplete() {
+        return wUnitsComplete;
+    }
+
+    @Override
+    protected int getRUnitsComplete() {
+        return rUnitsComplete;
+    }
+
+    @Override
+    protected DiskRun createDiskRun(DiskRun.BlockSequence blockSequence)
     {
         return new DiskRun(DiskRun.IOMode.READ, blockSequence);
     }
 
     @Override
-    public File createSingleTestDataFileIfNecessary()
+    protected File createSingleTestDataFileIfNecessary()
     {
         return null;
     }
 
     @Override
-    public DiskMark createDiskMark()
+    protected DiskMark createDiskMark()
     {
         return new DiskMark(READ);
     }
 
     @Override
-    public String getTestFileMode()
+    protected String getTestFileMode()
     {
         return "r";
     }
 
     @Override
-    public Boolean handleException(Exception ex) throws IOException {
+    protected Boolean handleException(Exception ex) throws IOException {
         if (ex.getClass() == FileNotFoundException.class) {
             Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
             String emsg = "May not have done Write Benchmarks, so no data available to read." +

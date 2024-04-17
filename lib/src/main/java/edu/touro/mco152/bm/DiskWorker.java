@@ -30,6 +30,9 @@ import static edu.touro.mco152.bm.App.msg;
 public class DiskWorker {
     Executor executor;
     private UiInterface ui;
+    private int cumulativeRUnits = 0;
+    private int cumulativeWUnits = 0;
+    private WriteCommand writeCommand;
     public DiskWorker(UiInterface ui)
     {
         this.ui = ui;
@@ -62,7 +65,7 @@ public class DiskWorker {
           The GUI allows a Write, Read, or both types of BMs to be started. They are done serially.
          */
         if (App.writeTest) {
-            WriteCommand writeCommand = new WriteCommand(ui, App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence);
+            writeCommand = new WriteCommand(ui, App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence);
             executor.executeCommand(writeCommand);
 
         }
@@ -76,11 +79,13 @@ public class DiskWorker {
         // try renaming all files to clear catch
         if (App.readTest && App.writeTest && !ui.isUiCancelled()) {
             ui.uiShowReadAndWriteMessage();
+            cumulativeWUnits = writeCommand.getWUnitsComplete();
+            cumulativeRUnits = writeCommand.getRUnitsComplete();
         }
 
         // Same as above, just for Read operations instead of Writes.
         if (App.readTest) {
-            ReadCommand readCommand = new ReadCommand(ui, App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence);
+            ReadCommand readCommand = new ReadCommand(ui, App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence, cumulativeWUnits, cumulativeRUnits);
             if(!executor.executeCommand(readCommand))
                 return false;
         }

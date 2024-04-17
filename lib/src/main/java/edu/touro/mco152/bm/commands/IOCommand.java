@@ -20,8 +20,7 @@ import static edu.touro.mco152.bm.App.*;
  * Represents a command to be performed. Classes that implement this interface
  * encapsulate the command's details and provide a method to execute it.
  */
-public abstract class IOCommand implements Command{
-
+public abstract class IOCommand implements Command {
     private UiInterface ui;
     private int numOfMarks;
     private int numOfBlocks;
@@ -49,10 +48,8 @@ public abstract class IOCommand implements Command{
     @Override
     public Boolean execute() throws Exception
     {
-        int wUnitsComplete = 0, rUnitsComplete = 0, unitsComplete;
-
         int wUnitsTotal = App.writeTest ? numOfBlocks * numOfMarks : 0;
-        int rUnitsTotal = numOfBlocks * numOfMarks;
+        int rUnitsTotal = App.readTest ? numOfBlocks * numOfMarks : 0;
         int unitsTotal = wUnitsTotal + rUnitsTotal;
         float percentComplete;
 
@@ -109,8 +106,8 @@ public abstract class IOCommand implements Command{
                         }
                         rAccFile.readFully(blockArr, 0, blockSize);
                         totalBytesProcessedInMark += blockSize;
-                        rUnitsComplete++;
-                        unitsComplete = rUnitsComplete + wUnitsComplete;
+                        incrementProcessUnitsComplete();
+                        int unitsComplete = getWUnitsComplete() + getRUnitsComplete();
                         percentComplete = (float) unitsComplete / (float) unitsTotal * 100f;
 
                         /*
@@ -162,27 +159,46 @@ public abstract class IOCommand implements Command{
     }
 
     /**
+     * Increments the count of io process units completed.
+     */
+    protected abstract void incrementProcessUnitsComplete();
+
+    /**
+     * Gets the total number of read units completed.
+     *
+     * @return The number of read units completed.
+     */
+    protected abstract int getRUnitsComplete();
+
+    /**
+     * Gets the total number of write units completed.
+     *
+     * @return The number of write units completed.
+     */
+    protected abstract int getWUnitsComplete();
+
+    /**
      * Handles exceptions that occur during command execution.
      *
      * @param ex the exception to handle
      * @return true if the exception is handled successfully, otherwise false
      * @throws IOException if an I/O error occurs
      */
-    public abstract Boolean handleException(Exception ex) throws IOException;
+    protected abstract Boolean handleException(Exception ex) throws IOException;
 
     /**
      * Gets the test file mode.
      *
      * @return the test file mode
      */
-    public abstract String getTestFileMode();
+    protected abstract String getTestFileMode();
 
     /**
      * Creates a DiskMark object.
      *
      * @return a DiskMark object
      */
-    public abstract DiskMark createDiskMark();
+    protected abstract DiskMark createDiskMark();
 
     /**
      * Creates a DiskRun object with the specified block sequence.
@@ -190,13 +206,13 @@ public abstract class IOCommand implements Command{
      * @param blockSequence the block sequence
      * @return a DiskRun object
      */
-    public abstract DiskRun createDiskRun(DiskRun.BlockSequence blockSequence);
+    protected abstract DiskRun createDiskRun(DiskRun.BlockSequence blockSequence);
 
     /**
      * Creates a single test data file if necessary.
      *
      * @return the created test data file
      */
-    public abstract File createSingleTestDataFileIfNecessary();
+    protected abstract File createSingleTestDataFileIfNecessary();
 }
 

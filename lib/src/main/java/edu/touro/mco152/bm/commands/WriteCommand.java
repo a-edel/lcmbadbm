@@ -18,21 +18,35 @@ import static edu.touro.mco152.bm.DiskMark.MarkType.WRITE;
  * Represents a command to perform a write operation. Implements the Command interface.
  */
 public class WriteCommand extends IOCommand {
-
+    private int wUnitsComplete;
     public WriteCommand(UiInterface ui, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence)
     {
         super(ui, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
-
     }
 
     @Override
-    public DiskRun createDiskRun(DiskRun.BlockSequence blockSequence)
+    protected void incrementProcessUnitsComplete() {
+        wUnitsComplete++;
+    }
+
+    @Override
+    public int getWUnitsComplete() {
+        return wUnitsComplete;
+    }
+
+    @Override
+    public int getRUnitsComplete() {
+        return 0;
+    }
+
+    @Override
+    protected DiskRun createDiskRun(DiskRun.BlockSequence blockSequence)
     {
         return new DiskRun(DiskRun.IOMode.WRITE, blockSequence);
     }
 
     @Override
-    public File createSingleTestDataFileIfNecessary()
+    protected File createSingleTestDataFileIfNecessary()
     {
         if (!App.multiFile)
             return testFile = new File(dataDir.getAbsolutePath() + File.separator + "testdata.jdm");
@@ -40,13 +54,13 @@ public class WriteCommand extends IOCommand {
     }
 
     @Override
-    public DiskMark createDiskMark()
+    protected DiskMark createDiskMark()
     {
         return new DiskMark(WRITE);
     }
 
     @Override
-    public String getTestFileMode()
+    protected String getTestFileMode()
     {
         String mode = "rw";
         if (App.writeSyncEnable) {
@@ -56,7 +70,7 @@ public class WriteCommand extends IOCommand {
     }
 
     @Override
-    public Boolean handleException(Exception ex)  {
+    protected Boolean handleException(Exception ex)  {
         if (ex.getClass() == IOException.class) {
             Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
         }
