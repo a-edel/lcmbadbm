@@ -10,6 +10,7 @@ import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,29 +21,28 @@ import static edu.touro.mco152.bm.DiskMark.MarkType.READ;
  * Represents a command to perform a read operation. Implements the Command interface.
  */
 public class ReadCommand extends IOCommand {
-    private int wUnitsComplete;
-    private int rUnitsComplete;
+    private int unitsComplete;
 
-    public ReadCommand(UiInterface ui, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence, int wUnitsComplete, int rUnitsComplete)
+    public ReadCommand(UiInterface ui, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence)
     {
         super(ui, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
-        this.wUnitsComplete = wUnitsComplete;
-        this.rUnitsComplete = rUnitsComplete;
+    }
+
+    public ReadCommand(UiInterface ui, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence, int wUnitsComplete)
+    {
+        super(ui, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
+        this.unitsComplete = wUnitsComplete;
     }
 
     @Override
-    protected void incrementProcessUnitsComplete() {
-        rUnitsComplete++;
+    protected void setUnitsCompleteSoFar(int unitsComplete)
+    {
+        this.unitsComplete = unitsComplete;
     }
 
     @Override
-    protected int getWUnitsComplete() {
-        return wUnitsComplete;
-    }
-
-    @Override
-    protected int getRUnitsComplete() {
-        return rUnitsComplete;
+    public int getUnitsCompleteSoFar() {
+        return unitsComplete;
     }
 
     @Override
@@ -84,4 +84,10 @@ public class ReadCommand extends IOCommand {
         }
         return true;
     }
+
+    @Override
+    protected void processRAccFile(RandomAccessFile rAccFile, byte[] blockArr, int blockSize) throws IOException {
+        rAccFile.readFully(blockArr, 0, blockSize);
+    }
+
 }

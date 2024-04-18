@@ -17,8 +17,8 @@ import java.util.Date;
 import static edu.touro.mco152.bm.App.*;
 
 /**
- * Represents a command to be performed. Classes that implement this interface
- * encapsulate the command's details and provide a method to execute it.
+ * Represents an io command to be performed. Classes that implement this interface
+ * encapsulate the io command's details and provide a method to execute it.
  */
 public abstract class IOCommand implements Command {
     private UiInterface ui;
@@ -51,7 +51,6 @@ public abstract class IOCommand implements Command {
         int wUnitsTotal = App.writeTest ? numOfBlocks * numOfMarks : 0;
         int rUnitsTotal = App.readTest ? numOfBlocks * numOfMarks : 0;
         int unitsTotal = wUnitsTotal + rUnitsTotal;
-        float percentComplete;
 
         int blockSize = blockSizeKb * KILOBYTE;
         byte[] blockArr = new byte[blockSize];
@@ -81,6 +80,9 @@ public abstract class IOCommand implements Command {
           that keeps writing data (in its own loop - for specified # of blocks). Each 'Mark' is timed
           and is reported to the GUI for display as each Mark completes.
          */
+
+        int unitsComplete = getUnitsCompleteSoFar();
+
         int startFileNum = App.nextMarkNumber;
         for (int m = startFileNum; m < startFileNum + numOfMarks && !ui.isUiCancelled(); m++) {
 
@@ -104,16 +106,16 @@ public abstract class IOCommand implements Command {
                         } else {
                             rAccFile.seek((long) b * blockSize);
                         }
-                        rAccFile.readFully(blockArr, 0, blockSize);
+                        processRAccFile(rAccFile, blockArr, blockSize);
                         totalBytesProcessedInMark += blockSize;
-                        incrementProcessUnitsComplete();
-                        int unitsComplete = getWUnitsComplete() + getRUnitsComplete();
-                        percentComplete = (float) unitsComplete / (float) unitsTotal * 100f;
+                        unitsComplete++;
+                        float percentComplete = (float) unitsComplete / (float) unitsTotal * 100f;
 
                         /*
                           Report to GUI what percentage level of Entire BM (#Marks * #Blocks) is done.
                          */
                         ui.setUiProgress((int) percentComplete);
+
                     }
                 }
             }
@@ -145,6 +147,8 @@ public abstract class IOCommand implements Command {
             run.setEndTime(new Date());
         }
 
+        setUnitsCompleteSoFar(unitsComplete);
+
         /*
           Persist info about the Read BM Run (e.g. into Derby Database) and add it to a GUI panel
          */
@@ -159,23 +163,28 @@ public abstract class IOCommand implements Command {
     }
 
     /**
-     * Increments the count of io process units completed.
+     * Processes the RandomAccessFile with the given blockArr and blockSize.
+     *
+     * @param rAccFile   the RandomAccessFile to process
+     * @param blockArr   the byte array representing the block
+     * @param blockSize  the size of the block
+     * @throws IOException if an I/O error occurs
      */
-    protected abstract void incrementProcessUnitsComplete();
+    protected abstract void processRAccFile(RandomAccessFile rAccFile, byte[] blockArr, int blockSize) throws IOException;
 
     /**
-     * Gets the total number of read units completed.
+     * Sets the total number of units completed so far.
      *
-     * @return The number of read units completed.
+     * @param unitsComplete the total number of units completed so far
      */
-    protected abstract int getRUnitsComplete();
+    protected abstract void setUnitsCompleteSoFar(int unitsComplete);
 
     /**
-     * Gets the total number of write units completed.
+     * Gets the total number of units completed so far, if any, from a previous command.
      *
-     * @return The number of write units completed.
+     * @return The number of units completed so far.
      */
-    protected abstract int getWUnitsComplete();
+    public abstract int getUnitsCompleteSoFar();
 
     /**
      * Handles exceptions that occur during command execution.

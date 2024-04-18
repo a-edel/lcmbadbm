@@ -30,8 +30,7 @@ import static edu.touro.mco152.bm.App.msg;
 public class DiskWorker {
     Executor executor;
     private UiInterface ui;
-    private int cumulativeRUnits = 0;
-    private int cumulativeWUnits = 0;
+    private int wUnitsComplete = 0;
     private WriteCommand writeCommand;
     public DiskWorker(UiInterface ui)
     {
@@ -67,7 +66,6 @@ public class DiskWorker {
         if (App.writeTest) {
             writeCommand = new WriteCommand(ui, App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence);
             executor.executeCommand(writeCommand);
-
         }
 
         /*
@@ -79,13 +77,12 @@ public class DiskWorker {
         // try renaming all files to clear catch
         if (App.readTest && App.writeTest && !ui.isUiCancelled()) {
             ui.uiShowReadAndWriteMessage();
-            cumulativeWUnits = writeCommand.getWUnitsComplete();
-            cumulativeRUnits = writeCommand.getRUnitsComplete();
+            wUnitsComplete = writeCommand.getUnitsCompleteSoFar();
         }
 
         // Same as above, just for Read operations instead of Writes.
         if (App.readTest) {
-            ReadCommand readCommand = new ReadCommand(ui, App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence, cumulativeWUnits, cumulativeRUnits);
+            ReadCommand readCommand = new ReadCommand(ui, App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence, wUnitsComplete);
             if(!executor.executeCommand(readCommand))
                 return false;
         }

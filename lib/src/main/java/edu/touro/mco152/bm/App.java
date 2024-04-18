@@ -190,6 +190,7 @@ public class App {
             Logger.getLogger(SelectFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     /**
      * Gets data about the configuration and returns it in String form.
      *
@@ -243,6 +244,7 @@ public class App {
     }
 
     public static void startBenchmark() {
+
 
         //1. check that there isn't already a worker in progress
         if (state == State.DISK_TEST_STATE) {

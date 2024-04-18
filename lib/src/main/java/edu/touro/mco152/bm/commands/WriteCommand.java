@@ -7,6 +7,7 @@ import edu.touro.mco152.bm.persist.DiskRun;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,25 +19,22 @@ import static edu.touro.mco152.bm.DiskMark.MarkType.WRITE;
  * Represents a command to perform a write operation. Implements the Command interface.
  */
 public class WriteCommand extends IOCommand {
-    private int wUnitsComplete;
+    private int unitsComplete;
+
     public WriteCommand(UiInterface ui, int numOfMarks, int numOfBlocks, int blockSizeKb, DiskRun.BlockSequence blockSequence)
     {
         super(ui, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
     }
 
     @Override
-    protected void incrementProcessUnitsComplete() {
-        wUnitsComplete++;
+    protected void setUnitsCompleteSoFar(int unitsComplete)
+    {
+        this.unitsComplete = unitsComplete;
     }
 
     @Override
-    public int getWUnitsComplete() {
-        return wUnitsComplete;
-    }
-
-    @Override
-    public int getRUnitsComplete() {
-        return 0;
+    public int getUnitsCompleteSoFar() {
+        return unitsComplete;
     }
 
     @Override
@@ -75,5 +73,10 @@ public class WriteCommand extends IOCommand {
             Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
         }
         return true;
+    }
+
+    @Override
+    protected void processRAccFile(RandomAccessFile rAccFile, byte[] blockArr, int blockSize) throws IOException {
+        rAccFile.write(blockArr, 0, blockSize);
     }
 }

@@ -67,7 +67,6 @@ public class UiInterfaceTest implements UiInterface
 
     @Override
     public void setUiProgress(int progress) {
-        System.out.println(progress);
         this.progress = progress;
         assertTrue(progress >= 0 && progress <= 100);
     }

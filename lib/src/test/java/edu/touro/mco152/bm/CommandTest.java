@@ -101,7 +101,7 @@ public class CommandTest {
      */
     @Test
     public void readTest() throws Exception {
-        ReadCommand readCommand = new ReadCommand(ui, numOfMarks, numOfBlocks, blockSizeKb, blockSequence, 0, 0);
+        ReadCommand readCommand = new ReadCommand(ui, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
         assertTrue(executor.executeCommand(readCommand));
     }
 }
