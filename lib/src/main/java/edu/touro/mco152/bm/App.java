@@ -45,10 +45,10 @@ public class App {
     public static int numOfMarks = 25;      // desired number of marks
     public static int numOfBlocks = 32;     // desired number of blocks
     public static int blockSizeKb = 512;    // size of a block in KBs
-    public static UiInterface ui;
     public static int nextMarkNumber = 1;   // number of the next mark
     public static double wMax = -1, wMin = -1, wAvg = -1;
     public static double rMax = -1, rMin = -1, rAvg = -1;
+    private static UiInterface ui;
 
     /**
      * @param args the command line arguments
@@ -190,6 +190,7 @@ public class App {
             Logger.getLogger(SelectFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     /**
      * Gets data about the configuration and returns it in String form.
      *
@@ -243,6 +244,7 @@ public class App {
     }
 
     public static void startBenchmark() {
+
 
         //1. check that there isn't already a worker in progress
         if (state == State.DISK_TEST_STATE) {

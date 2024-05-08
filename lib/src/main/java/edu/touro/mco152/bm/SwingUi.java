@@ -23,8 +23,8 @@ public class SwingUi extends SwingWorker<Boolean, DiskMark> implements UiInterfa
     }
 
     @Override
-    public void setUiProgress(int i) {
-        setProgress(i);
+    public void setUiProgress(int progress) {
+        setProgress(progress);
     }
 
     @Override

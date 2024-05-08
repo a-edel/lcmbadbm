@@ -1,25 +1,31 @@
 package edu.touro.mco152.bm;
 
+import edu.touro.mco152.bm.commands.Executor;
+import edu.touro.mco152.bm.commands.ReadCommand;
+import edu.touro.mco152.bm.commands.WriteCommand;
+import edu.touro.mco152.bm.persist.DiskRun;
 import edu.touro.mco152.bm.ui.Gui;
 import edu.touro.mco152.bm.ui.MainFrame;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * This class is a non-Swing implementation of the UiInterface and provides testing for its methods.
+ * Test class for ReadCommand and WriteCommand.
+ * Tests the execution of read and write commands.
  */
-public class UiInterfaceTest implements UiInterface
-{
-    private int progress = 0;
-    private DiskWorker diskWorker = new DiskWorker(this);
-
+public class CommandTest {
+    private UiInterface ui;
+    private Executor executor;
+    private int numOfMarks;
+    private int numOfBlocks;
+    private int blockSizeKb;
+    private DiskRun.BlockSequence blockSequence;
 
     /**
      * Bruteforce setup of static classes/fields to allow DiskWorker to run.
@@ -60,62 +66,42 @@ public class UiInterfaceTest implements UiInterface
         }
     }
 
+    /**
+     * Setup method to run before all tests.
+     */
     @BeforeAll
     static void setupBeforeAll() {
         setupDefaultAsPerProperties();
     }
 
-    @Override
-    public void setUiProgress(int progress) {
-        this.progress = progress;
-        assertTrue(progress >= 0 && progress <= 100);
+    /**
+     * Setup method to run before each test.
+     */
+    @BeforeEach
+    void setup() {
+        ui = new UiInterfaceTest();
+        executor = new Executor();
+        numOfMarks = 25;
+        numOfBlocks = 128;
+        blockSizeKb = 2048;
+        blockSequence = DiskRun.BlockSequence.SEQUENTIAL;
     }
 
-    @Override
-    public void uiPublish(DiskMark dm) {
-    }
-
-    @Override
-    public void startUi() {
-        try {
-            assertTrue(diskWorker.startBenchmarking());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
+    /**
+     * Test method for write command execution.
+     */
     @Test
-    void benchmarkTest()
-    {
-        assertEquals(0, progress);
-        startUi();
-        assertEquals(100, progress);
+    public void writeTest() throws Exception {
+        WriteCommand writeCommand = new WriteCommand(ui, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
+        assertTrue(executor.executeCommand(writeCommand));
     }
 
-    @Override
-    public void uiShowReadAndWriteMessage() {
-        System.out.println("""
-                        For valid READ measurements please clear the disk cache by
-                        using the included RAMMap.exe or flush-mem.exe utilities.
-                        Removable drives can be disconnected and reconnected.
-                        For system drives use the WRITE and READ operations
-                        independently by doing a cold reboot after the WRITE.
-                        """);
-    }
-
-    // following methods not instantiated for basic ui
-    @Override
-    public void uiCancel(Boolean b) {
-
-    }
-
-    @Override
-    public Boolean isUiCancelled() {
-        return false;
-    }
-
-    @Override
-    public void uiAddPropertyChangeListener(PropertyChangeListener listener) {
-
+    /**
+     * Test method for read command execution.
+     */
+    @Test
+    public void readTest() throws Exception {
+        ReadCommand readCommand = new ReadCommand(ui, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
+        assertTrue(executor.executeCommand(readCommand));
     }
 }
