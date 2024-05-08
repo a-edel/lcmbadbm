@@ -150,7 +150,7 @@ public abstract class IOCommand implements Command {
         setUnitsCompleteSoFar(unitsComplete);
 
         /*
-          Persist info about the Read BM Run (e.g. into Derby Database) and add it to a GUI panel
+          Persist info about the BM Run (e.g. into Derby Database) and add it to a GUI panel
          */
         EntityManager em = EM.getEntityManager();
         em.getTransaction().begin();
