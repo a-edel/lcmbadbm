@@ -2,6 +2,7 @@ package edu.touro.mco152.bm.ui;
 
 import edu.touro.mco152.bm.App;
 import edu.touro.mco152.bm.DiskMark;
+import edu.touro.mco152.bm.Observer;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -21,7 +22,12 @@ import java.text.NumberFormat;
  * stores gui references for easy access.
  */
 public final class Gui {
-
+    public static Observer updateGuiObserver = run -> {
+        /*
+          Add info about the BM Run to a GUI panel
+         */
+        Gui.runPanel.addRun(run);
+    };
     public static ChartPanel chartPanel = null;
     public static MainFrame mainFrame = null;
     public static SelectFrame selFrame = null;
