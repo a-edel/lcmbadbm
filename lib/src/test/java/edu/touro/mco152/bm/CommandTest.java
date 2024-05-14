@@ -6,9 +6,7 @@ import edu.touro.mco152.bm.commands.WriteCommand;
 import edu.touro.mco152.bm.persist.DiskRun;
 import edu.touro.mco152.bm.ui.Gui;
 import edu.touro.mco152.bm.ui.MainFrame;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.File;
 import java.util.Properties;
@@ -19,13 +17,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Test class for ReadCommand and WriteCommand.
  * Tests the execution of read and write commands.
  */
-public class CommandTest {
+public class CommandTest implements Observer {
     private UiInterface ui;
     private Executor executor;
     private int numOfMarks;
     private int numOfBlocks;
     private int blockSizeKb;
     private DiskRun.BlockSequence blockSequence;
+    private static boolean observerInvoked;
 
     /**
      * Bruteforce setup of static classes/fields to allow DiskWorker to run.
@@ -93,6 +92,7 @@ public class CommandTest {
     @Test
     public void writeTest() throws Exception {
         WriteCommand writeCommand = new WriteCommand(ui, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
+        writeCommand.registerObserver(this);
         assertTrue(executor.executeCommand(writeCommand));
     }
 
@@ -102,6 +102,17 @@ public class CommandTest {
     @Test
     public void readTest() throws Exception {
         ReadCommand readCommand = new ReadCommand(ui, numOfMarks, numOfBlocks, blockSizeKb, blockSequence);
+        readCommand.registerObserver(this);
         assertTrue(executor.executeCommand(readCommand));
+    }
+
+    @Override
+    public void update(DiskRun run) {
+        observerInvoked = true;
+    }
+
+    @AfterAll
+    static void observerInvoked() {
+        assertTrue(observerInvoked);
     }
 }
