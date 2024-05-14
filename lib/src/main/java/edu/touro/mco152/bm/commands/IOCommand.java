@@ -1,18 +1,15 @@
 package edu.touro.mco152.bm.commands;
 
-import edu.touro.mco152.bm.App;
-import edu.touro.mco152.bm.DiskMark;
-import edu.touro.mco152.bm.UiInterface;
-import edu.touro.mco152.bm.Util;
+import edu.touro.mco152.bm.*;
 import edu.touro.mco152.bm.persist.DiskRun;
-import edu.touro.mco152.bm.persist.EM;
 import edu.touro.mco152.bm.ui.Gui;
-import jakarta.persistence.EntityManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static edu.touro.mco152.bm.App.*;
 
@@ -20,7 +17,8 @@ import static edu.touro.mco152.bm.App.*;
  * Represents an io command to be performed. Classes that implement this interface
  * encapsulate the io command's details and provide a method to execute it.
  */
-public abstract class IOCommand implements Command {
+public abstract class IOCommand implements Command, Subject {
+    private List<Observer> observers = new ArrayList<>();
     private UiInterface ui;
     private int numOfMarks;
     private int numOfBlocks;
@@ -149,17 +147,25 @@ public abstract class IOCommand implements Command {
 
         setUnitsCompleteSoFar(unitsComplete);
 
-        /*
-          Persist info about the BM Run (e.g. into Derby Database) and add it to a GUI panel
-         */
-        EntityManager em = EM.getEntityManager();
-        em.getTransaction().begin();
-        em.persist(run);
-        em.getTransaction().commit();
-
-        Gui.runPanel.addRun(run);
+        notifyObservers(run);
 
         return true;
+    }
+
+    @Override
+    public void registerObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void unregisterObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(DiskRun run) {
+        for (Observer observer : observers)
+            observer.update(run);
     }
 
     /**
