@@ -3,6 +3,7 @@ package edu.touro.mco152.bm;
 import edu.touro.mco152.bm.commands.Executor;
 import edu.touro.mco152.bm.commands.ReadCommand;
 import edu.touro.mco152.bm.commands.WriteCommand;
+import edu.touro.mco152.bm.persist.UpdateDatabaseObserver;
 import edu.touro.mco152.bm.ui.Gui;
 
 import java.util.logging.Level;
@@ -32,6 +33,9 @@ public class DiskWorker {
     private UiInterface ui;
     private int wUnitsComplete = 0;
     private WriteCommand writeCommand;
+    private Observer updateDatabaseObserver = new UpdateDatabaseObserver();
+    private Observer rulesObserver = new RulesObserver();
+
     public DiskWorker(UiInterface ui)
     {
         this.ui = ui;
@@ -65,6 +69,11 @@ public class DiskWorker {
          */
         if (App.writeTest) {
             writeCommand = new WriteCommand(ui, App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence);
+
+            writeCommand.registerObserver(updateDatabaseObserver);
+            writeCommand.registerObserver(Gui.updateGuiObserver);
+            writeCommand.registerObserver(rulesObserver);
+
             executor.executeCommand(writeCommand);
         }
 
@@ -83,10 +92,17 @@ public class DiskWorker {
         // Same as above, just for Read operations instead of Writes.
         if (App.readTest) {
             ReadCommand readCommand = new ReadCommand(ui, App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence, wUnitsComplete);
+
+            readCommand.registerObserver(updateDatabaseObserver);
+            readCommand.registerObserver(Gui.updateGuiObserver);
+            readCommand.registerObserver(rulesObserver);
+
             if(!executor.executeCommand(readCommand))
                 return false;
         }
+
         App.nextMarkNumber += App.numOfMarks;
+
         return true;
     }
 }
